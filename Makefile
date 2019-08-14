@@ -6,7 +6,7 @@ dailymotion_updater: main.go dm/ChannelList.go dm/dmapi.go vidispine/MetadataFie
 dailymotion_updater.linux64: dailymotion_updater
 	GOOS=linux GOARCH=amd64 go build -o dailymotion_updater.linux64
 
-docker: dailymotion_updater.linux64
+docker: dailymotion_updater.linux64 Dockerfile
 	./build-docker-image.sh
     
 test:
