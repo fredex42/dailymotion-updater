@@ -1,4 +1,4 @@
-all: dailymotion_updater docker
+all: dailymotion_updater
 
 dailymotion_updater: main.go dm/ChannelList.go dm/dmapi.go vidispine/MetadataFieldGroup.go vidispine/PortalExtraFieldData.go vidispine/VSCommunicator.go vidispine/VSFieldGroup.go
 	go build

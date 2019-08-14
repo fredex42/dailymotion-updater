@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/fredex42/dailymotion-updater/dm"
 	"github.com/fredex42/dailymotion-updater/vidispine"
 	"log"
@@ -12,7 +14,7 @@ import (
 /**
 gets the string value of the given environment variable and returns the given default value
 if none was found
- */
+*/
 func GetWithDefault(key string, dfl string) string {
 	rtn := os.Getenv(key)
 	if rtn == "" {
@@ -24,7 +26,7 @@ func GetWithDefault(key string, dfl string) string {
 
 /**
 same as GetWithDefault but converts to an int16. Fatal error logged if the value does not convert.
- */
+*/
 func GetInt16WithDefault(key string, dfl int) int16 {
 	result, err := strconv.Atoi(GetWithDefault(key, string(dfl)))
 	if err != nil {
@@ -66,13 +68,18 @@ func main() {
 	}
 
 	log.Printf("Connecting to %s://%s:%d as %s...", vscomm.Protocol, vscomm.Hostname, vscomm.Port, vscomm.User)
-	fieldGroup, fgErr := vidispine.GetFieldGroup(vscomm, groupToFind)
+	//fieldGroup, fgErr := vidispine.GetFieldGroup(vscomm, groupToFind)
+	//
+	//if fgErr != nil {
+	//	log.Fatal("Could not look up fieldgroup: ", fgErr)
+	//}
 
-	if fgErr != nil {
-		log.Fatal("Could not look up fieldgroup: ", fgErr)
+	mdField, getErr := vidispine.GetMDField(vscomm, fieldToUpdate)
+
+	spew.Dump(mdField)
+	if getErr != nil {
+		log.Fatal("Could not look up metadata field: ", getErr)
 	}
-
-	mdField := fieldGroup.GetFieldByName(fieldToUpdate)
 	if mdField == nil {
 		log.Fatalf("Could not find field %s in group %s", fieldToUpdate, groupToFind)
 	}
@@ -82,9 +89,42 @@ func main() {
 		log.Fatal("Could not locate field data: ", fdErr)
 	}
 
+	if fieldData == nil {
+		log.Fatal("No extradata field found on ", fieldToUpdate)
+	}
+	spew.Dump(fieldData)
+
 	newValuesPtr := dm.ChannelListToKV(channelList)
 
+	spew.Dump(newValuesPtr)
 	isEqual := vidispine.CompareValuesList(newValuesPtr, &fieldData.Values)
 
 	log.Printf("Existing values and new values equal? %t", isEqual)
+
+	if isEqual == true {
+		log.Printf("No update needed\n")
+	} else {
+		fieldData.Values = *newValuesPtr
+		marshalled, marshalErr := json.Marshal(&fieldData)
+
+		if marshalErr != nil {
+			log.Fatal("Could not convert back to json ", marshalErr)
+		}
+
+		setErr := mdField.SetDataKey("extradata", marshalled)
+		mdField.StringRestriction.MaxLength = 2048
+		if setErr != nil {
+			log.Fatal("Could not set data key ", setErr)
+		}
+
+		//writeErr := vidispine.SetFieldGroup(vscomm,groupToFind,fieldGroup)
+		//
+		writeErr := vidispine.SetMDField(vscomm, fieldToUpdate, mdField)
+		if writeErr != nil {
+			log.Fatal("Could not update server ", writeErr)
+		}
+
+	}
+
+	log.Print("Completed.\n")
 }

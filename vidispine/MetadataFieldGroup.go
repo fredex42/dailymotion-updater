@@ -2,6 +2,7 @@ package vidispine
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -22,20 +23,35 @@ type Schema struct {
 }
 
 type MetadataField struct {
-	Name              string            `xml:"name"`
-	Type              string            `xml:"type"`
-	Schema            Schema            `xml:"schema"`
-	Data              []GenericData     `xml:"data"`
-	StringRestriction StringRestriction `xml:"stringRestriction"`
-	Origin            string            `xml:"origin"`
+	Name              string             `xml:"name"`
+	Type              string             `xml:"type"`
+	Schema            Schema             `xml:"schema"`
+	Data              []GenericData      `xml:"data"`
+	StringRestriction *StringRestriction `xml:"stringRestriction"`
+	Origin            string             `xml:"origin"`
+}
+
+type MetadataFieldDocument struct {
+	XmlNS             string             `xml:"xmlns,attr"`
+	Name              string             `xml:"name"`
+	Type              string             `xml:"type"`
+	Schema            Schema             `xml:"schema"`
+	Data              []GenericData      `xml:"data"`
+	StringRestriction *StringRestriction `xml:"stringRestriction"`
+	Origin            string             `xml:"origin"`
 }
 
 type MetadataFieldGroup struct {
+	XmlNS  string          `xml:"xmlns,attr"`
 	Name   string          `xml:"name"`
 	Schema Schema          `xml:"schema"`
 	Data   []GenericData   `xml:"data"`
 	Fields []MetadataField `xml:"field"`
 	Origin string          `xml:"origin"`
+}
+
+func (doc *MetadataFieldDocument) getMetadataField() MetadataField {
+	return MetadataField{doc.Name, doc.Type, doc.Schema, doc.Data, doc.StringRestriction, doc.Origin}
 }
 
 func (d *GenericValue) toString() string {
@@ -69,7 +85,7 @@ func (group *MetadataFieldGroup) GetFieldByName(name string) *MetadataField {
 /**
 returns the data for the given data key, or nil if the key does not exist.
 */
-func (field *MetadataField) GetDataKey(key string) (bool, string) {
+func (field *MetadataFieldDocument) GetDataKey(key string) (bool, string) {
 	for _, entry := range field.Data {
 		if entry.Key == key {
 			return true, entry.Value
@@ -79,9 +95,23 @@ func (field *MetadataField) GetDataKey(key string) (bool, string) {
 }
 
 /**
+set the data for the given data key. Errors if the key does not exist.
+*/
+func (field *MetadataFieldDocument) SetDataKey(key string, newValue []byte) error {
+	for ctr, entry := range field.Data {
+		if entry.Key == key {
+			field.Data[ctr].Value = string(newValue)
+			return nil
+		}
+	}
+	errMsg := fmt.Sprintf("Data key %s not found", key)
+	return errors.New(errMsg)
+}
+
+/**
 convenience function to locate, unmarshal and return any extra field data
 */
-func (field *MetadataField) GetPortalData() (*PortalExtraFieldData, error) {
+func (field *MetadataFieldDocument) GetPortalData() (*PortalExtraFieldData, error) {
 	found, d := field.GetDataKey("extradata")
 	if found == false {
 		return nil, nil

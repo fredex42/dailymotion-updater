@@ -415,3 +415,21 @@ func TestMarshalData(t *testing.T) {
 	//
 	//fmt.Printf("%s", outstring)
 }
+
+func TestMetadataFieldDocument_SetDataKey(t *testing.T) {
+	test := MetadataFieldDocument{"", "test_field", "string", Schema{}, []GenericData{
+		{
+			Key:   "testkey",
+			Value: "before value",
+		},
+	}, nil, "VX"}
+
+	err := test.SetDataKey("testkey", []byte("after value"))
+	if err != nil {
+		t.Error("SetDataKey errored: ", err)
+	}
+
+	if test.Data[0].Value != "after value" {
+		t.Error("SetDataKey did not set the key. Expected 'after value', got '" + test.Data[0].Value + "'")
+	}
+}
