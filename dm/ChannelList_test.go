@@ -1,7 +1,7 @@
 package dm
 
 import (
-	"github.com/fredex42/dailymotion_updater/vidispine"
+	"github.com/fredex42/dailymotion-updater/vidispine"
 	"testing"
 )
 

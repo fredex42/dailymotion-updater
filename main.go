@@ -2,13 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/fredex42/dailymotion_updater/dm"
-	"github.com/fredex42/dailymotion_updater/vidispine"
+	"github.com/fredex42/dailymotion-updater/dm"
+	"github.com/fredex42/dailymotion-updater/vidispine"
 	"log"
 	"os"
 	"strconv"
 )
 
+/**
+gets the string value of the given environment variable and returns the given default value
+if none was found
+ */
 func GetWithDefault(key string, dfl string) string {
 	rtn := os.Getenv(key)
 	if rtn == "" {
@@ -18,6 +22,9 @@ func GetWithDefault(key string, dfl string) string {
 	}
 }
 
+/**
+same as GetWithDefault but converts to an int16. Fatal error logged if the value does not convert.
+ */
 func GetInt16WithDefault(key string, dfl int) int16 {
 	result, err := strconv.Atoi(GetWithDefault(key, string(dfl)))
 	if err != nil {
@@ -27,7 +34,7 @@ func GetInt16WithDefault(key string, dfl int) int16 {
 }
 
 func main() {
-	fmt.Print("dailymotion_updater by Andy Gallagher - https://github.com/fredex42/dailymotion_updater\n")
+	fmt.Print("dailymotion_updater by Andy Gallagher - https://github.com/fredex42/dailymotion-updater\n")
 
 	channelList, chanErr := dm.GetChannels()
 	if chanErr != nil {

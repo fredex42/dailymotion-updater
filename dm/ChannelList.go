@@ -1,6 +1,6 @@
 package dm
 
-import "github.com/fredex42/dailymotion_updater/vidispine"
+import "github.com/fredex42/dailymotion-updater/vidispine"
 
 type DMChannel struct {
 	Id          string `json:"id"`
