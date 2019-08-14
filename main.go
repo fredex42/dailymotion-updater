@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/fredex42/dailymotion_updater/dm"
 	"github.com/fredex42/dailymotion_updater/vidispine"
 	"log"
@@ -28,14 +27,13 @@ func GetInt16WithDefault(key string, dfl int) int16 {
 }
 
 func main() {
-	fmt.Print("dailymotion_updater by Andy Gallagher - https://github.com/fredex42/dailymotion_updater")
+	fmt.Print("dailymotion_updater by Andy Gallagher - https://github.com/fredex42/dailymotion_updater\n")
 
 	channelList, chanErr := dm.GetChannels()
 	if chanErr != nil {
 		log.Fatal("Could not get channel data from Daily Motion API: ", chanErr)
 	}
 
-	spew.Dump(channelList)
 	log.Printf("Got %d channels returned", len(*channelList))
 
 	groupToFind := os.Getenv("MDGROUP_NAME")
@@ -67,8 +65,6 @@ func main() {
 		log.Fatal("Could not look up fieldgroup: ", fgErr)
 	}
 
-	spew.Dump(fieldGroup)
-
 	mdField := fieldGroup.GetFieldByName(fieldToUpdate)
 	if mdField == nil {
 		log.Fatalf("Could not find field %s in group %s", fieldToUpdate, groupToFind)
@@ -79,5 +75,9 @@ func main() {
 		log.Fatal("Could not locate field data: ", fdErr)
 	}
 
-	spew.Dump(fieldData)
+	newValuesPtr := dm.ChannelListToKV(channelList)
+
+	isEqual := vidispine.CompareValuesList(newValuesPtr, &fieldData.Values)
+
+	log.Printf("Existing values and new values equal? %t", isEqual)
 }

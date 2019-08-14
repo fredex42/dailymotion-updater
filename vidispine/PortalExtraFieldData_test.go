@@ -49,3 +49,120 @@ func TestMarshalExtraData(t *testing.T) {
 		t.Error("Output did not match expected result")
 	}
 }
+
+func TestCompareValuesListUnequal(t *testing.T) {
+	list1 := []GenericValue{
+		{
+			Key:   "value1",
+			Value: "First value",
+		},
+		{
+			Key:   "value2",
+			Value: "Second value",
+		},
+		{
+			Key:   "value3",
+			Value: "Third value",
+		},
+	}
+
+	list2 := []GenericValue{
+		{
+			Key:   "value1",
+			Value: "First value",
+		},
+		{
+			Key:   "value4",
+			Value: "Fourth value",
+		},
+		{
+			Key:   "value3",
+			Value: "Third value",
+		},
+	}
+
+	result := CompareValuesList(&list1, &list2)
+	if result != false {
+		t.Error("Did not detect difference between same-length lists")
+		t.FailNow()
+	}
+}
+
+func TestCompareValuesListJumbled(t *testing.T) {
+	list1 := []GenericValue{
+		{
+			Key:   "value1",
+			Value: "First value",
+		},
+		{
+			Key:   "value2",
+			Value: "Second value",
+		},
+		{
+			Key:   "value3",
+			Value: "Third value",
+		},
+	}
+
+	list2 := []GenericValue{
+		{
+			Key:   "value1",
+			Value: "First value",
+		},
+		{
+			Key:   "value3",
+			Value: "Third value",
+		},
+		{
+			Key:   "value2",
+			Value: "Second value",
+		},
+	}
+
+	result := CompareValuesList(&list1, &list2)
+	if result != true {
+		t.Error("Detected difference between same lists that are in different orders")
+		t.FailNow()
+	}
+}
+
+func TestCompareValuesListLength(t *testing.T) {
+	list1 := []GenericValue{
+		{
+			Key:   "value1",
+			Value: "First value",
+		},
+		{
+			Key:   "value2",
+			Value: "Second value",
+		},
+		{
+			Key:   "value3",
+			Value: "Third value",
+		},
+	}
+
+	list2 := []GenericValue{
+		{
+			Key:   "value1",
+			Value: "First value",
+		},
+		{
+			Key:   "value3",
+			Value: "Third value",
+		},
+		{
+			Key:   "value2",
+			Value: "Second value",
+		},
+		{
+			Key:   "value5",
+			Value: "Fifth value",
+		},
+	}
+
+	result := CompareValuesList(&list1, &list2)
+	if result != false {
+		t.Error("Detected no difference between different-length lists")
+	}
+}

@@ -2,6 +2,9 @@ package vidispine
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
+	"sort"
 )
 
 type GenericValue struct {
@@ -95,4 +98,41 @@ func (p *PortalExtraFieldData) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(dictData)
+}
+
+/**
+compares the two sets of values. returns a boolean indicating if they are equal (true)
+*/
+func CompareValuesList(a *[]GenericValue, b *[]GenericValue) bool {
+	if len(*a) != len(*b) {
+		log.Printf("Lists were different lengths, %d vs %d", len(*a), len(*b))
+		return false
+	}
+
+	sortedA := make([]GenericValue, len(*a))
+	copy(sortedA, *a)
+	sort.Slice(sortedA, func(i, j int) bool {
+		return sortedA[i].Key < sortedA[j].Key
+	})
+
+	sortedB := make([]GenericValue, len(*b))
+	copy(sortedB, *b)
+
+	sort.Slice(sortedB, func(i, j int) bool {
+		return sortedB[i].Key < sortedB[j].Key
+	})
+
+	log.Print(sortedA)
+	log.Print(sortedB)
+
+	//since we are now sorted, if the two are non-equal they must also be in the same order.
+	//therefore, for any given ctr if a[ctr] != b[ctr] there is a difference in the list
+	for ctr := range sortedA {
+		fmt.Printf("Compare %s to %s\n", sortedA[ctr].toString(), sortedB[ctr].toString())
+		if sortedA[ctr].Key != sortedB[ctr].Key || sortedA[ctr].Value != sortedB[ctr].Value {
+			log.Printf("Got difference at %d: %s -> %s\n", ctr, sortedA[ctr].toString(), sortedB[ctr].toString())
+			return false
+		}
+	}
+	return true
 }

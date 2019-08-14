@@ -1,6 +1,9 @@
 package vidispine
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type GenericData struct {
 	Key   string `xml:"key",json:"key"`
@@ -33,6 +36,10 @@ type MetadataFieldGroup struct {
 	Data   []GenericData   `xml:"data"`
 	Fields []MetadataField `xml:"field"`
 	Origin string          `xml:"origin"`
+}
+
+func (d *GenericValue) toString() string {
+	return fmt.Sprintf("%s: %s", d.Key, d.Value)
 }
 
 /**

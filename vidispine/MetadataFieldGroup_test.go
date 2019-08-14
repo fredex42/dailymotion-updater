@@ -2,7 +2,6 @@ package vidispine
 
 import (
 	"encoding/xml"
-	"fmt"
 	"testing"
 )
 
@@ -406,13 +405,13 @@ func TestMarshalData(t *testing.T) {
 		t.Error("Could not unmarshal xml: ", err)
 	}
 
-	out, marshalErr := xml.Marshal(test)
+	_, marshalErr := xml.Marshal(test)
 
 	if marshalErr != nil {
 		t.Error("Failed to marshal data structure ", err)
 	}
 
-	outstring := string(out)
-
-	fmt.Printf("%s", outstring)
+	//outstring := string(out)
+	//
+	//fmt.Printf("%s", outstring)
 }
