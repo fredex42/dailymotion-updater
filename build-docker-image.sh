@@ -21,3 +21,4 @@ if [ "${DOCKERORG}" == "" ]; then
 fi
 
 docker build . -t ${DOCKERORG}/dailymotion_updater:${BUILDNUM}
+docker push ${DOCKERORG}/dailymotion_updater:${BUILDNUM}

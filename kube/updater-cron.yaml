@@ -1,0 +1,38 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: dailymotion-updater
+spec:
+  schedule: "01 */6 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - image: guardianmultimedia/dailymotion_updater:1
+              name: dailymotion-updater
+              env:
+                - name: VIDISPINE_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      key: vs_host
+                      name: dailymotion-updater-secrets
+                - name: VIDISPINE_USER
+                  valueFrom:
+                    secretKeyRef:
+                      key: vs_user
+                      name: dailymotion-updater-secrets
+                - name: VIDISPINE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: vs_passwd
+                      name: dailymotion-updater-secrets
+                - name: VIDISPINE_PORT
+                  value: "8080"
+                - name: VIDISPINE_PROTOCOL
+                  value: http
+                - name: MDFIELD_NAME
+                  value: gnm_master_dailymotion_dailymotioncategory
+                - name: MDGROUP_NAME
+                  value: MasterDailyMotion
+          restartPolicy: OnFailure

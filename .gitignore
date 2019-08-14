@@ -86,3 +86,5 @@ fabric.properties
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+/kube/updater-secrets*.yaml
+!/kube/updater-secrets-example.yaml
