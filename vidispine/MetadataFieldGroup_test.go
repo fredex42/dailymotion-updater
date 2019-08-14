@@ -329,7 +329,7 @@ func TestGetDataKeyFound(t *testing.T) {
 		t.Error("Could not unmarshal xml: ", err)
 	}
 
-	found, result := test.getDataKey("extradata")
+	found, result := test.GetDataKey("extradata")
 	if found != true {
 		t.Error("getDataKey didn't find existing data")
 	}
@@ -348,12 +348,48 @@ func TestGetDataKeyAbsent(t *testing.T) {
 		t.Error("Could not unmarshal xml: ", err)
 	}
 
-	found, result := test.getDataKey("dadsjkhads")
+	found, result := test.GetDataKey("dadsjkhads")
 	if found != false {
 		t.Error("getDataKey claimed to find non-existing data")
 	}
 	if len(result) > 0 {
 		t.Error("getDataKey returned data when none was expected")
+	}
+}
+
+func TestGetFieldByName(t *testing.T) {
+	var test MetadataFieldGroup
+
+	sample_data_bytes := []byte(sample_data)
+	err := xml.Unmarshal(sample_data_bytes, &test)
+
+	if err != nil {
+		t.Error("Could not unmarshal xml: ", err)
+	}
+
+	result := test.GetFieldByName("gnm_master_dailymotion_title")
+	if result == nil {
+		t.Error("GetFieldByName found nothing when it should have found gnm_master_dailymotion_title")
+	}
+
+	if result.Name != "gnm_master_dailymotion_title" {
+		t.Errorf("GetFieldByName returned wrong field, got name %s", result.Name)
+	}
+}
+
+func TestGetFieldByNameNone(t *testing.T) {
+	var test MetadataFieldGroup
+
+	sample_data_bytes := []byte(sample_data)
+	err := xml.Unmarshal(sample_data_bytes, &test)
+
+	if err != nil {
+		t.Error("Could not unmarshal xml: ", err)
+	}
+
+	result := test.GetFieldByName("fsdsdfgasga")
+	if result != nil {
+		t.Error("GetFieldByName a field when it should not have found anything")
 	}
 }
 

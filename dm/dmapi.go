@@ -13,9 +13,12 @@ import (
 var BASE_URL = "https://api.dailymotion.com"
 var MAX_ATTEMPTS int16 = 100
 
+/**
+read and close the HTTP body
+*/
 func readBody(response *http.Response) ([]byte, error) {
+	defer response.Body.Close()
 	rtn, readErr := ioutil.ReadAll(response.Body)
-	response.Body.Close()
 
 	return rtn, readErr
 }
