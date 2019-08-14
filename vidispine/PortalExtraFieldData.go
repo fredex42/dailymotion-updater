@@ -6,13 +6,13 @@ import (
 
 type GenericValue struct {
 	Key   string `json:"key"`
-	Value string `kson:"value"`
+	Value string `json:"value"`
 }
 
 type GroupInformation struct {
 	Required       bool `json:"required"`
 	HideIfNotSet   bool `json:"hideifnotset"`
-	Representative bool `json:"represenatative"`
+	Representative bool `json:"representative"`
 }
 
 type PortalExtraFieldData struct {
@@ -75,6 +75,8 @@ func (p *PortalExtraFieldData) UnmarshalJSON(bytes []byte) error {
 /**
 custom marshal method builds a k-v map from the structured data and then marshals that in order to deal with key-named
 group information
+NOTE: you MUST marshal a POINTER to the struct for this to get called.
+i.e. json.Marshal(data) won't work but json.Marshal(&data) will.
 */
 func (p *PortalExtraFieldData) MarshalJSON() ([]byte, error) {
 	var dictData = make(map[string]interface{})

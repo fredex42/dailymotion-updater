@@ -1,8 +1,8 @@
 package vidispine
 
 type GenericData struct {
-	Key   string `xml:"key"`
-	Value string `xml:"value"`
+	Key   string `xml:"key",json:"key"`
+	Value string `xml:"value",json:"value"`
 }
 
 type StringRestriction struct {
